@@ -106,11 +106,21 @@ function fragment(id) {
   return encodeURIComponent(id.replace(/ /g, '_' ));
 }
 
+function href(id) {
+  const p = path(id);
+  if ( p ) {
+    return `href="${p}"`;
+  } else {
+    return '';
+  }
+}
+
 function path(id) {
   const needle = trees.findNodeAndTree(id);
   if ( needle ) {
     const path = needle.tree.root.id;
-    return `${path}.html#${fragment(id)}`;
+    const depth = trees.getDepth( needle.tree.root );
+    return trees.getDepth( needle.tree.root ) > 0 ? `${path}.html#${fragment(id)}` : '';
   } else {
     return '';
   }
