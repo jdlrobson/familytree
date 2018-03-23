@@ -3,3 +3,11 @@
   border-left: solid 5px black;
   padding-left: 20px;
 }
+
+.person--female {
+  border-left-color: pink;
+}
+
+.person--male {
+   border-left-color: blue;
+}

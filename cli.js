@@ -112,7 +112,27 @@ function path(id) {
     const path = needle.tree.root.id;
     return `${path}.html#${fragment(id)}`;
   } else {
-    return '#';
+    return '';
+  }
+}
+
+function getAllChildren(node) {
+  if ( node.data.sex === 'F' ) {
+    if ( node.data.spouse ) {
+      const spouses = node.data.spouse.split(',');
+      let children = [];
+      spouses.forEach((spouse) => {
+        const spouseNode = trees.findNodeInTrees(spouse);
+        if ( spouseNode && spouseNode.children ) {
+          children = children.concat( spouseNode.children );
+        }
+      });
+      return children;
+    } else {
+      return [];
+    }
+  } else {
+    return node.children.sort((child, child2) => child.data.dob < child2.data.dob ? -1 : 1 );
   }
 }
 
@@ -129,17 +149,17 @@ function generateHTML(node, depth = 0) {
     )
   ].filter(partner=>partner !== undefined);
   let html =
-`<div class="person person__${modifierClass}">
+`<div class="person person--${modifierClass}">
   <div class="person__content">
     <h3 class="person__heading" id="${fragment(node.id)}">${node.id} (${date(data.dob)}-${date(data.dod)})</h3>
     <p class="person__text">${node.data.text}</p>
     ${dl(data)}
 `;
-  const children = node.children.sort((child, child2) => child.data.dob < child2.data.dob ? -1 : 1 );
+  const children = getAllChildren(node);
   partners.forEach((partner) => {
-    html += `<p class="person__spouse">Children with <a href="${path(partner)}">${partner}</a></p><div class="person__children">
+    html += `<p class="person__spouse">Children with <a ${href(partner)}>${partner}</a></p><div class="person__children">
     `;
-    const theirChildren = children.filter((node)=>node.data.mother === partner);
+    const theirChildren = children.filter((node)=>node.data.mother === partner || node.data.father === partner);
     if ( theirChildren.length ) {
       theirChildren.forEach((child) => {
         html += generateHTML(child, depth+1);
@@ -154,7 +174,7 @@ function generateHTML(node, depth = 0) {
     html += 'No partner';
   }
 
-  const unaccountedChildren = children.filter((node)=>!node.data.mother);
+  const unaccountedChildren = children.filter((node)=>!node.data.mother || !node.data.father);
   if ( unaccountedChildren.length ) {
     html += `<p class="person__spouse">Children with unknown partner</p><div class="person__children">`;
     
