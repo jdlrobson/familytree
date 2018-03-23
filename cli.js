@@ -38,7 +38,7 @@ const FILTER_DEPTH_1 = (tree) => {
 };
 
 function showIndex(listOfTrees, filter = FILTER_DEPTH_1) {
-  listOfTrees.map((tree) => {
+  const filteredSortedTrees = listOfTrees.map((tree) => {
     tree._depth = trees.getDepth( tree.root );
     return tree;
   }).filter(filter).sort((tree, otherTree) => {
@@ -47,11 +47,13 @@ function showIndex(listOfTrees, filter = FILTER_DEPTH_1) {
     } else {
       return tree._depth > otherTree._depth ? -1 : 1;
     }
-  } ).forEach((tree, i) => {
+  } )
+  filteredSortedTrees.forEach((tree, i) => {
     const dob = tree.root.data.dob || '????'
     console.log(`Tree#${i}`, tree.root.id,
       `born ${dob.substr(0, 4)} (${tree.root.children.length} children, depth=${tree._depth})`);
   });
+  return filteredSortedTrees;
 }
 
 function getUserInput( msg ) {
@@ -242,8 +244,7 @@ function menu() {
         showIndex(roots);
         break;
       case 1:
-        showIndex(roots);
-        return requestTreeHTML(roots).then(()=>saveTreeToJSON());
+        return requestTreeHTML(showIndex(roots)).then(()=>saveTreeToJSON());
       case 2:
         return updateTree(roots);
       case 3:
