@@ -263,7 +263,11 @@ function mergeNode( intoNT, fromNT ) {
       into.data[key] = from.data[key];
       console.log('copy', key, 'to', into.id);
     }
-  })
+  });
+  // copy across the children if necessary
+  from.children.forEach((child) => {
+    into.addChild( child );
+  });
   console.log(`Deleting node ${from.id} from its tree ${fromNT.tree.root}`);
 	trees.deleteNodeInTree(fromNT.tree, from);
   from.children = [];
@@ -331,7 +335,7 @@ function menu() {
         showIndex(roots);
         break;
       case 1:
-        return requestTreeHTML(showIndex(roots)).then(()=>saveTreeToJSON());
+        return requestTreeHTML(showIndex(roots, (tree)=>true)).then(()=>saveTreeToJSON());
       case 2:
         return updateTree(roots);
       case 3:
