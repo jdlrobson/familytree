@@ -1,7 +1,19 @@
+body {
+  overflow: scroll;
+  white-space: nowrap;
+}
+
 .person {
   margin-left: 20px;
   border-left: solid 5px black;
   padding-left: 20px;
+}
+
+.person__heading,
+.person__data,
+.person__text {
+  width: 500px;
+  white-space: normal;
 }
 
 .person--female {
