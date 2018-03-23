@@ -172,7 +172,7 @@ function saveTreeToHTML(filename, trees) {
     <html>
     <head>
       <link href="styles.css" rel="stylesheet">
-      <title>{tree.root.id}</title>
+      <title>${trees.length === 1 ? trees[0].root.id + '\'s family tree' : 'Family tree' }</title>
     </head>
     <body>
       ${trees.map((tree)=>treeToHTML(tree)).join('\n')}
@@ -183,6 +183,8 @@ function saveTreeToHTML(filename, trees) {
   fs.writeFile( `html/${filename}.html`, html, 'utf-8', function ( err ) {
     if ( err ) {
       console.log('Failed to save :(', err);
+    } else {
+      console.log( html );
     }
   } );
 }
@@ -211,7 +213,8 @@ function addData() {
               console.log(`${field} of ${node.id} set to ${otherNode.id}`);
               node.data[field] = otherNode.id
             } else {
-              console.log( `Failed to find ${val}.` );
+              console.log( `Note: ${val} is not in the tree.` );
+              node.data[field] = val;
             }
           });
         } else {
@@ -232,6 +235,26 @@ function updateTree(roots) {
   })
 }
 
+function findPerson() {
+  return getUserInput( 'Who to find?' ).then((input) => {
+    const node = trees.findNodeInTrees(input);
+    if ( node ) {
+      const fatherId = node.data.father;
+      const motherId = node.data.mother;
+      const father = trees.findNodeInTrees( fatherId );
+      const mother = trees.findNodeInTrees( motherId );
+      console.log(node.id);
+      Object.keys(node.data).forEach((field) => {
+        console.log('\t', field + ':' + node.data[field])
+      });
+      console.log('Mother:', motherId, mother ? '' : '<Not found>');
+      console.log('Father:', fatherId, father ? '' : '<Not found>');
+      console.log('Spouse:', node.data.spouse);
+      console.log('Children:', node.children.map((child) => child.id).join(','));
+    }
+  })
+}
+
 function menu() {
   console.log(`
     MENU:
@@ -240,6 +263,7 @@ function menu() {
     2: Update a node in a tree
     3: Show orphans
     4: Show seedlings
+    5: Find and print person
   `);
   return getUserInput( 'What to do?' ).then((input) => {
     const choice = parseInt(input, 10);
@@ -258,6 +282,8 @@ function menu() {
       case 4:
         showIndex(roots, (tree)=>tree._depth === 1);
         break;
+      case 5:
+        return findPerson();
       default:
         console.log('Huh?');
     }
@@ -273,6 +299,12 @@ loadTreeFromJSON().then(() => {
         delete node.data[field];
       }
     });
+    if ( node.data.dob === '0000-00-00' ) {
+      delete node.data.dob;
+    }
+    if ( node.data.dod === '0000-00-00' ) {
+      delete node.data.dod;
+    }
   });
   saveTreeToJSON();
   menu();
