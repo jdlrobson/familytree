@@ -106,6 +106,16 @@ function fragment(id) {
   return encodeURIComponent(id.replace(/ /g, '_' ));
 }
 
+function path(id) {
+  const needle = trees.findNodeAndTree(id);
+  if ( needle ) {
+    const path = needle.tree.root.id;
+    return `${path}.html#${fragment(id)}`;
+  } else {
+    return '#';
+  }
+}
+
 function generateHTML(node, depth = 0) {
   const data = node.data;
   const tabs = Array(depth+2).join('\t');
@@ -125,9 +135,9 @@ function generateHTML(node, depth = 0) {
     <p class="person__text">${node.data.text}</p>
     ${dl(data)}
 `;
-  const children = node.children;
+  const children = node.children.sort((child, child2) => child.data.dob < child2.data.dob ? -1 : 1 );
   partners.forEach((partner) => {
-    html += `<p class="person__spouse">Children with <a href="#${fragment(partner)}">${partner}</a></p><div class="person__children">
+    html += `<p class="person__spouse">Children with <a href="${path(partner)}">${partner}</a></p><div class="person__children">
     `;
     const theirChildren = children.filter((node)=>node.data.mother === partner);
     if ( theirChildren.length ) {
@@ -191,7 +201,9 @@ function saveTreeToHTML(filename, trees) {
 function requestTreeHTML(roots) {
   return getUserInput( 'Which tree do you want to generate HTML for? (type its number or * for all)' ).then((input) => {
     if (input === '*' ) {
-      saveTreeToHTML('all', roots);
+      roots.forEach((tree) => {
+        saveTreeToHTML(tree.root.id, [tree]);
+      });
     } else {
       const choice = parseInt(input, 10);
       const tree = roots[choice];
