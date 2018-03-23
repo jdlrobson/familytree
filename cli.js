@@ -2,10 +2,15 @@ const trees = require( './src/trees' );
 const fs = require( 'fs' );
 const util = require('util');
 const FIELD_BLACKLIST = [
-  'changecount', 'father', 'mother','type', 'tags', 'created', 'modified', 'text',
-  'modifier', 'title', 'sex', 'vismoxy', 'spouse'
+  'changecount', 'type', 'tags', 'created', 'modified',
+  'modifier', 'vismoxy'
 ];
 
+const FIELD_RENDER_BLACKLIST = FIELD_BLACKLIST.concat(
+  [
+    'father', 'mother', 'title', 'sex', 'spouse', 'text'
+  ]
+);
 function saveTreeToJSON() {
   return new Promise( (resolve, reject ) => {
     fs.writeFile( 'tree.json', JSON.stringify( trees.getNodes() ), 'utf-8', function ( err ) {
@@ -87,7 +92,7 @@ function dl(data) {
     causeofdeath: 'cause of death',
     placeofdeath: 'place of death'
   };
-  const items = Object.keys(data).filter((key) => FIELD_BLACKLIST.indexOf(key) === -1).map((key) => {
+  const items = Object.keys(data).filter((key) => FIELD_RENDER_BLACKLIST.indexOf(key) === -1).map((key) => {
     return `\t\t<dt>${labels[key] || key}</dt><dd>${data[key]}</dd>`;
   }).join('\n');
 
@@ -261,5 +266,14 @@ function menu() {
 loadTreeFromJSON().then(() => {
   console.log('***');
   console.log( `Loaded ${trees.all().length} trees of ${trees.names.length} names.` );
+
+  trees.getNodes().forEach((node) => {
+    FIELD_BLACKLIST.forEach((field) => {
+      if ( node.data[field] !== undefined ) {
+        delete node.data[field];
+      }
+    });
+  });
+  saveTreeToJSON();
   menu();
 });
