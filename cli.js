@@ -12,6 +12,7 @@ const FIELD_RENDER_BLACKLIST = FIELD_BLACKLIST.concat(
   ]
 );
 function saveTreeToJSON() {
+  console.log('Saving...');
   return new Promise( (resolve, reject ) => {
     fs.writeFile( 'tree.json', JSON.stringify( trees.getNodes() ), 'utf-8', function ( err ) {
       if ( err ) {
@@ -308,6 +309,12 @@ function mergeNode( intoNT, fromNT ) {
   });
   // copy across the children if necessary
   from.children.forEach((child) => {
+    if ( child.data.father === from.id ) {
+      child.data.father = into.id;
+    }
+    if ( child.data.mother === from.id ) {
+      child.data.mother = into.id;
+    }
     into.addChild( child );
   });
   console.log(`Deleting node ${from.id} from its tree ${fromNT.tree.root}`);
