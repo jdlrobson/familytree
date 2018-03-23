@@ -255,6 +255,61 @@ function findPerson() {
   })
 }
 
+function mergeNode( intoNT, fromNT ) {
+  const into = intoNT.node;
+  const from = fromNT.node;
+  Object.keys( from.data ).forEach((key) => {
+    if ( !into.data[key] ) {
+      into.data[key] = from.data[key];
+      console.log('copy', key, 'to', into.id);
+    }
+  })
+  console.log(`Deleting node ${from.id} from its tree ${fromNT.tree.root}`);
+	trees.deleteNodeInTree(fromNT.tree, from);
+  from.children = [];
+  delete from.data.father;
+  delete from.data.mother;
+}
+
+function findAndMergeNodes() {
+  return getUserInput( 'Who to merge into?' ).then((input) => {
+    const node = trees.findNodeAndTree(input);
+    if ( node ) {
+      console.log('Found that one...');
+      return getUserInput( 'Who is the duplicate?' ).then((input) => {
+        const node2 = trees.findNodeAndTree(input);
+        mergeNode( node, node2 );
+        return saveTreeToJSON();
+      });
+    }
+  } );
+}
+
+function findAndDeleteNode() {
+  return getUserInput( 'Who to delete?' ).then((input) => {
+    const node = trees.findNodeInTrees(input);
+    if ( node ) {
+      trees.deleteTreeWithRoot( node.id );
+    }
+    return saveTreeToJSON();
+  } );
+}
+
+function findAndAddChild() {
+  return getUserInput( 'Who is the parent?' ).then((input) => {
+    const parentNode = trees.findNodeInTrees(input);
+    if ( parentNode ) {
+      return getUserInput( 'Who is the child?' ).then((input) => {
+        const childNode = trees.findNodeInTrees(input);
+        if ( childNode ) {
+          parentNode.addChild( childNode );
+        }
+      });
+    }
+    return saveTreeToJSON();
+  } );
+}
+
 function menu() {
   console.log(`
     MENU:
@@ -264,6 +319,9 @@ function menu() {
     3: Show orphans
     4: Show seedlings
     5: Find and print person
+    6: Merge nodes
+    7: Delete note
+    8: Add child
   `);
   return getUserInput( 'What to do?' ).then((input) => {
     const choice = parseInt(input, 10);
@@ -284,6 +342,12 @@ function menu() {
         break;
       case 5:
         return findPerson();
+      case 6:
+        return findAndMergeNodes();
+      case 7:
+        return findAndDeleteNode();
+      case 8:
+        return findAndAddChild();
       default:
         console.log('Huh?');
     }

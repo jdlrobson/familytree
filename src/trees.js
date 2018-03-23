@@ -4,7 +4,26 @@ const GraphNode = require('./GraphNode');
 let trees = [];
 const names = [];
 
-function findNodeInTrees(person) {
+function deleteChildOfParent(root, child) {
+	root.children.forEach((c, i) => {
+		if ( c.id === child.id ) {
+			// delete the child to orphan it
+			if ( c.children.length ) {
+				console.log('Cowardly refusing to delete a node with children' );
+			} else {
+				root.children.splice( i, 1 );
+				console.log('Found and deleted child ' + child.id);
+			}
+		} else {
+			deleteChildOfParent(c, child);
+		}
+	} );
+}
+function deleteNodeInTree(tree, node) {
+	deleteChildOfParent(tree.root, node);
+}
+
+function findNodeAndTree(person) {
 	for ( let i = 0; i < trees.length; i++ ) {
 		let tree = trees[i];
 
@@ -12,8 +31,18 @@ function findNodeInTrees(person) {
 		//console.log('search', tree.root.id, 'for ', data.father);
 		let node = tree.getNode(person);
 		if ( node ) {
-			return node;
+			return {
+				node,
+				tree
+			};
 		}
+	}
+}
+
+function findNodeInTrees(person) {
+	const needle = findNodeAndTree(person);
+	if ( needle && needle.node ) {
+		return needle.node;
 	}
 }
 
@@ -59,13 +88,6 @@ function mergeTrees() {
 	}
 }
 
-function saveEntry(a, json) {
-	console.log('save', a, json)
-}
-
-function deleteEntry(a) {
-	console.log('delete', a );
-}
 function showOrphans() {
 	trees.filter(( tree ) => {
 		return tree.root.children.length === 0;
@@ -135,7 +157,21 @@ function all() {
 	return trees;
 }
 
+function deleteTreeWithRoot( id ) {
+  const index = all().findIndex((tree) => {
+    return tree.root.id === id;
+  } );
+  if ( index !== -1 ) {
+    console.log('Delete', id, trees.splice(index, 1));
+  } else {
+    console.log('I can only delete root nodes.');
+  }
+}
+
 module.exports = {
+	findNodeAndTree,
+	deleteNodeInTree,
+  deleteTreeWithRoot,
 	findNodeInTrees,
 	all,
   getDepth,
