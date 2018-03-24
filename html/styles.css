@@ -33,3 +33,8 @@ a {
   font-style: italic;
   font-size: 0.9em;
 }
+
+footer {
+  margin-top: 20px;
+  font-size: 0.8em;
+}
