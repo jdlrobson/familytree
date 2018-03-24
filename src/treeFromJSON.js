@@ -23,8 +23,8 @@ function sanitize() {
         delete node.data[field];
       }
     });
-    if ( node.data.text === "Type the text for 'New Tiddler'" ) {
-      delete node.data.text;
+    if ( node.data.text.indexOf( "Type the text for 'New Tiddler'" ) > -1 ) {
+      node.data.text = '';
     }
     if ( node.data.dob === '0000-00-00' ) {
       delete node.data.dob;
