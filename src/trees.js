@@ -48,6 +48,20 @@ function findNodeInTrees(person) {
 
 function addToTree( data ) {
 	const node = new GraphNode( data.title, data, [] );
+	let exists = findNodeInTrees(data.title);
+	if ( exists ) {
+		console.log('Duplicate name found:' + data.title);
+		// copy across fields..
+		Object.keys(data).forEach((field) => {
+			if ( !exists.data[field] ) {
+				console.log('\tCopy field ', field);
+				exists.data[field] = data[field];
+			} else {
+				console.log('\tIgnore field', field);
+			}
+		});
+		return;
+	}
 
 	if ( trees.length ) {
 		// go through each tree and see if name can be added to one of the trees
