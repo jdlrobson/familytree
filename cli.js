@@ -369,8 +369,8 @@ function menu() {
     0: Show all trees with children
     1: Generate HTML for a tree
     2: Update a node in a tree
-    3: Show orphans
-    4: Show seedlings
+    3: show childless roots
+    4: Show seedlings (small trees with depth 1)
     5: Find and print person
     6: Merge nodes
     7: Delete note
@@ -388,7 +388,7 @@ function menu() {
       case 2:
         return updateTree(roots);
       case 3:
-        trees.showOrphans();
+        trees.showChildlessRoots();
         break;
       case 4:
         showIndex(roots, (tree)=>tree._depth === 1);

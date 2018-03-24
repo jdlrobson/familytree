@@ -88,12 +88,12 @@ function mergeTrees() {
 	}
 }
 
-function showOrphans() {
+function showChildlessRoots() {
 	trees.filter(( tree ) => {
 		return tree.root.children.length === 0;
 	}).forEach((tree) => {
 		if ( tree.root.data.father ) {
-			console.log(tree.root.data.title);
+			console.log( `Title:"${tree.root.data.title}" has no children` );
 		}
 	})
 }
@@ -178,5 +178,5 @@ module.exports = {
 	getNodes,
 	names,
 	addNodes,
-	showOrphans
+	showChildlessRoots
 };
