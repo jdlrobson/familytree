@@ -72,29 +72,35 @@ function requestTreeHTML(roots) {
   });
 }
 
+function updateFields(node) {
+  return getUserInput( 'Field to update?' ).then((field) => {
+    let msg;
+    // @todo: spouse support
+    if ( field === 'father' || field === 'mother' ) {
+      return getUserInput( 'Enter name to find.' ).then((val) => {
+        const otherNode = trees.findNodeInTrees(val);
+        if ( otherNode ) {
+          console.log(`${field} of ${node.id} set to ${otherNode.id}`);
+          node.data[field] = otherNode.id
+        } else {
+          console.log( `Note: ${val} is not in the tree (but added anyway).` );
+          node.data[field] = val;
+        }
+      });
+    } else if ( field ) {
+      return getUserInput( 'Value?' ).then((val) => {
+        node.data[field] = val;
+        return updateFields(node);
+      });
+    }
+  } );
+}
+
 function addData() {
   return getUserInput( 'Which node to update?' ).then((input) => {
     const node = trees.findNodeInTrees(input);
     if ( node ) {
-      return getUserInput( 'Field to update?' ).then((field) => {
-        let msg;
-        if ( field === 'father' || field === 'mother' ) {
-          return getUserInput( 'Enter name to find.' ).then((val) => {
-            const otherNode = trees.findNodeInTrees(val);
-            if ( otherNode ) {
-              console.log(`${field} of ${node.id} set to ${otherNode.id}`);
-              node.data[field] = otherNode.id
-            } else {
-              console.log( `Note: ${val} is not in the tree.` );
-              node.data[field] = val;
-            }
-          });
-        } else {
-          return getUserInput( 'Value?' ).then((val) => {
-            node.data[field] = val;
-          });
-        }
-      } );
+      return updateFields(node);
     } else {
       return addData();
     }
