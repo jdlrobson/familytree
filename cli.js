@@ -168,21 +168,22 @@ function generateHTML(node, depth = 0) {
 `;
   const children = getAllChildren(node);
   partners.forEach((partner) => {
-    html += `<p class="person__spouse">Children with <a ${href(partner)}>${partner}</a></p><div class="person__children">
+    html += `<p class="person__spouse">Children with <a ${href(partner)}>${partner}</a></p>
     `;
     const theirChildren = children.filter((node)=>node.data.mother === partner || node.data.father === partner);
     if ( theirChildren.length ) {
+      html += '<div class="person__children">';
       theirChildren.forEach((child) => {
         html += generateHTML(child, depth+1);
       });
     } else {
+       html += '<div class="person__children--none">';
        html += 'No children';
     }
     html += '</div>';
   });
   if ( !partners.length ) {
-    // TODO: Find the spouse and join their tree!
-    html += 'No partner';
+    html += '<div class="person__partner--none">No partner</div>';
   }
 
   const unaccountedChildren = children.filter((node)=>!node.data.mother || !node.data.father);
@@ -410,12 +411,22 @@ loadTreeFromJSON().then(() => {
   console.log('***');
   console.log( `Loaded ${trees.all().length} trees of ${trees.names.length} names.` );
 
+  // Sanitize
+  sanitize();
+  saveTreeToJSON();
+  menu();
+});
+
+function sanitize() {
   trees.getNodes().forEach((node) => {
     FIELD_BLACKLIST.forEach((field) => {
       if ( node.data[field] !== undefined ) {
         delete node.data[field];
       }
     });
+    if ( node.data.text === "Type the text for 'New Tiddler'" ) {
+      delete node.data.text;
+    }
     if ( node.data.dob === '0000-00-00' ) {
       delete node.data.dob;
     }
@@ -423,6 +434,4 @@ loadTreeFromJSON().then(() => {
       delete node.data.dod;
     }
   });
-  saveTreeToJSON();
-  menu();
-});
+}
