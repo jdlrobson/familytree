@@ -3,6 +3,13 @@ const trees = require( './src/trees' );
 const loadTreeFromJSON = require( './src/treeFromJSON' );
 const saveTreeToHTML = require('./src/html');
 const util = require('util');
+const SORT_TREES_BY_DEPTH = ( tree, otherTree) => {
+  if ( tree._depth === otherTree._depth ) {
+    return tree.root.data.title.toLowerCase() > otherTree.root.data.title.toLowerCase() ? -1 : 1;
+  } else {
+    return tree._depth > otherTree._depth ? -1 : 1;
+  }
+};
 
 function saveTreeToJSON() {
   console.log('Saving...');
@@ -31,13 +38,7 @@ function showIndex(listOfTrees, filter = FILTER_DEPTH_1) {
   const filteredSortedTrees = listOfTrees.map((tree) => {
     tree._depth = trees.getDepth( tree.root );
     return tree;
-  }).filter(filter).sort((tree, otherTree) => {
-    if ( tree._depth === otherTree._depth ) {
-      return tree.root.data.title.toLowerCase() > otherTree.root.data.title.toLowerCase() ? -1 : 1;
-    } else {
-      return tree._depth > otherTree._depth ? -1 : 1;
-    }
-  } )
+  }).filter(filter).sort(SORT_TREES_BY_DEPTH)
   filteredSortedTrees.forEach((tree, i) => {
     const dob = tree.root.data.dob || '????'
     console.log(`Tree#${i}`, tree.root.id,
@@ -62,6 +63,7 @@ function requestTreeHTML(roots) {
       roots.forEach((tree) => {
         saveTreeToHTML(tree.root.id, [tree]);
       });
+      saveTreeToHTML('index', roots.sort(SORT_TREES_BY_DEPTH), true);
     } else {
       const choice = parseInt(input, 10);
       const tree = roots[choice];
