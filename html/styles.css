@@ -23,3 +23,13 @@ body {
 .person--male {
    border-left-color: blue;
 }
+
+a {
+  font-weight: bold;
+}
+
+.person__partner--none
+.person__children--none {
+  font-style: italic;
+  font-size: 0.9em;
+}
