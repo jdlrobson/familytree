@@ -23,13 +23,13 @@ function deleteNodeInTree(tree, node) {
 	deleteChildOfParent(tree.root, node);
 }
 
-function findNodeAndTree(person) {
+function findNodeAndTree(person, fuzzy) {
 	for ( let i = 0; i < trees.length; i++ ) {
 		let tree = trees[i];
 
 		// find their father.
 		//console.log('search', tree.root.id, 'for ', data.father);
-		let node = tree.getNode(person);
+		let node = tree.getNode(person, fuzzy);
 		if ( node ) {
 			return {
 				node,
@@ -39,8 +39,8 @@ function findNodeAndTree(person) {
 	}
 }
 
-function findNodeInTrees(person) {
-	const needle = findNodeAndTree(person);
+function findNodeInTrees(person, fuzzy) {
+	const needle = findNodeAndTree(person, fuzzy);
 	if ( needle && needle.node ) {
 		return needle.node;
 	}

@@ -26,7 +26,14 @@ Graph.prototype.getNodes = function () {
 	return nodes;
 }
 
-Graph.prototype.getNode = function ( id ) {
+function fuzzyMatch( node, id ) {
+  return node.id.toLowerCase().indexOf(id.toLowerCase()) > -1;
+}
+/**
+ * @param {string} id the id to match
+ * @param {boolean} if fuzzy will search for name that is similar
+ */
+Graph.prototype.getNode = function ( id, fuzzy ) {
 	// bfs
 	let visited = {};
 	let queue = [];
@@ -36,6 +43,8 @@ Graph.prototype.getNode = function ( id ) {
 	if ( !this.root ) {
 		return false;
 	} else if ( this.root.id === id ) {
+		return this.root;
+	} else if ( fuzzy && fuzzyMatch( this.root, id ) ) {
 		return this.root;
 	} else {
 		queue.push( this.root );
@@ -47,6 +56,8 @@ Graph.prototype.getNode = function ( id ) {
 				let child = children[i];
 				let curId =  child.id;
 				if ( curId === id ) {
+					return child;
+				} else if ( fuzzy && fuzzyMatch( child, id ) ) {
 					return child;
 				} else if ( !visited[curId] ) { // avoid loops
 					visited[curId] = true;

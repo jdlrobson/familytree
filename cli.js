@@ -103,6 +103,17 @@ function addData() {
       displayPerson(node);
       return updateFields(node);
     } else {
+      const node = trees.findNodeInTrees(input, true);
+      if ( node ) {
+        return getUserInput( `Did you mean ${node.id}? Press enter for No, otherwise type YES!` ).then((input) => {
+          if ( input ) {
+            displayPerson(node);
+            return updateFields(node);
+          } else {
+            return addData();
+          }
+        } );
+      }
       console.log('Could not find.')
       return addData();
     }
