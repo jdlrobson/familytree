@@ -73,7 +73,7 @@ function requestTreeHTML(roots) {
 }
 
 function updateFields(node) {
-  return getUserInput( 'Field to update?' ).then((field) => {
+  return getUserInput( 'Field to update? (Press enter to update none)' ).then((field) => {
     let msg;
     // @todo: spouse support
     if ( field === 'father' || field === 'mother' ) {
@@ -100,8 +100,10 @@ function addData() {
   return getUserInput( 'Which node to update?' ).then((input) => {
     const node = trees.findNodeInTrees(input);
     if ( node ) {
+      displayPerson(node);
       return updateFields(node);
     } else {
+      console.log('Could not find.')
       return addData();
     }
   });
@@ -113,24 +115,19 @@ function updateTree(roots) {
   })
 }
 
-function findPerson() {
-  return getUserInput( 'Who to find?' ).then((input) => {
-    const node = trees.findNodeInTrees(input);
-    if ( node ) {
-      const fatherId = node.data.father;
-      const motherId = node.data.mother;
-      const father = trees.findNodeInTrees( fatherId );
-      const mother = trees.findNodeInTrees( motherId );
-      console.log(node.id);
-      Object.keys(node.data).forEach((field) => {
-        console.log('\t', field + ':' + node.data[field])
-      });
-      console.log('Mother:', motherId, mother ? '' : '<Not found>');
-      console.log('Father:', fatherId, father ? '' : '<Not found>');
-      console.log('Spouse:', node.data.spouse);
-      console.log('Children:', node.children.map((child) => child.id).join(','));
-    }
-  })
+function displayPerson(node) {
+  const fatherId = node.data.father;
+  const motherId = node.data.mother;
+  const father = trees.findNodeInTrees( fatherId );
+  const mother = trees.findNodeInTrees( motherId );
+  console.log(node.id);
+  Object.keys(node.data).forEach((field) => {
+    console.log('\t', field + ':' + node.data[field])
+  });
+  console.log('Mother:', motherId, mother ? '' : '<Not found>');
+  console.log('Father:', fatherId, father ? '' : '<Not found>');
+  console.log('Spouse:', node.data.spouse);
+  console.log('Children:', node.children.map((child) => child.id).join(','));
 }
 
 function mergeNode( intoNT, fromNT ) {
@@ -203,10 +200,9 @@ function menu() {
     MENU:
     0: Show all trees with children
     1: Generate HTML for a tree
-    2: Update a node in a tree
+    2: Update/show a node in a tree
     3: show childless roots
     4: Show seedlings (small trees with depth 1)
-    5: Find and print person
     6: Merge nodes
     7: Delete note
     8: Add child
@@ -228,8 +224,6 @@ function menu() {
       case 4:
         showIndex(roots, (tree)=>tree._depth === 1);
         break;
-      case 5:
-        return findPerson();
       case 6:
         return findAndMergeNodes();
       case 7:
