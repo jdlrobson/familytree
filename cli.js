@@ -203,7 +203,7 @@ function findAndAddChild() {
         } else {
           console.log('Child not found so adding new node...');
           return getUserInput( `Is ${parentName}} the father? (Enter for yes, anything else for no)` ).then((answer) => {
-            let data = {};
+            let data = { text: '' };
             if ( answer ) {
               data.mother = parentName;
             } else {
