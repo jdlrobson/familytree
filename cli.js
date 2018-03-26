@@ -151,14 +151,34 @@ function mergeNode( intoNT, fromNT ) {
       console.log('copy', key, 'to', into.id);
     }
   });
+  console.log(from);
+  let children = from.children;
+  if ( !children.length && from.data.spouse ) {
+    let spouses = from.data.spouse.split(',');
+    if ( !spouses.length ) {
+      console.log( 'Unable to find a spouse to search for children' );
+    }
+    spouses.forEach((spouse) => {
+      const node = trees.findNodeInTrees(spouse);
+      if ( node ) {
+        children = children.concat( node.children );
+      }
+    });
+  }
+  if ( !children.length ) {
+    console.log('Unable to find any children');
+  }
   // copy across the children if necessary
-  from.children.forEach((child) => {
+  children.forEach((child) => {
     if ( child.data.father === from.id ) {
+      console.log(`Switched father of ${child.id} from ${from.id} to ${into.id}`);
       child.data.father = into.id;
     }
     if ( child.data.mother === from.id ) {
+      console.log(`Switched mother of ${child.id} from ${from.id} to ${into.id}`);
       child.data.mother = into.id;
     }
+    console.log(`Adding child to ${into.id}`);
     into.addChild( child );
   });
   console.log(`Deleting node ${from.id} from its tree ${fromNT.tree.root}`);
@@ -170,9 +190,13 @@ function mergeNode( intoNT, fromNT ) {
 
 function findAndMergeNodes() {
   return getUserInput( 'Who to merge into?' ).then((input) => {
-    const node = trees.findNodeAndTree(input);
+    let node = trees.findNodeAndTree(input);
+    if ( !node ) {
+      console.log('Creating new node... (abort script to cancel)');
+      trees.addToTree( { title: input, text: '' } );
+      node = trees.findNodeAndTree( input );
+    }
     if ( node ) {
-      console.log('Found that one...');
       return getUserInput( 'Who is the duplicate?' ).then((input) => {
         const node2 = trees.findNodeAndTree(input);
         mergeNode( node, node2 );
