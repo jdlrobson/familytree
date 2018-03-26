@@ -60,7 +60,7 @@ function addToTree( data ) {
 				console.log('\tIgnore field', field);
 			}
 		});
-		return;
+		return exists;
 	}
 
 	if ( trees.length ) {
@@ -77,6 +77,7 @@ function addToTree( data ) {
 	}
 
 	names.push( data.title.trim() );
+	return node;
 }
 
 function mergeTrees() {
@@ -183,6 +184,7 @@ function deleteTreeWithRoot( id ) {
 }
 
 module.exports = {
+	addToTree,
 	findNodeAndTree,
 	deleteNodeInTree,
   deleteTreeWithRoot,

@@ -86,6 +86,7 @@ function updateFields(node) {
           console.log( `Note: ${val} is not in the tree (but added anyway).` );
           node.data[field] = val;
         }
+        return updateFields(node);
       });
     } else if ( field ) {
       return getUserInput( 'Value?' ).then((val) => {
@@ -192,13 +193,29 @@ function findAndDeleteNode() {
 }
 
 function findAndAddChild() {
-  return getUserInput( 'Who is the parent?' ).then((input) => {
-    const parentNode = trees.findNodeInTrees(input);
+  return getUserInput( 'Who is the parent?' ).then((parentName) => {
+    const parentNode = trees.findNodeInTrees(parentName);
     if ( parentNode ) {
       return getUserInput( 'Who is the child?' ).then((input) => {
         const childNode = trees.findNodeInTrees(input);
         if ( childNode ) {
           parentNode.addChild( childNode );
+        } else {
+          console.log('Child not found so adding new node...');
+          return getUserInput( `Is ${parentName}} the father? (Enter for yes, anything else for no)` ).then((answer) => {
+            let data = {};
+            if ( answer ) {
+              data.mother = parentName;
+            } else {
+              data.father = parentName;
+            }
+            data.title = input;
+            const node = trees.addToTree( data );
+            displayPerson(node);
+            return updateFields(node);
+          }).then(() => {
+            return saveTreeToJSON();
+          })
         }
       });
     }
