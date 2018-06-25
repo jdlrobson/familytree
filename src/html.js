@@ -160,6 +160,7 @@ function saveTreeToHTML(filename, trees, rootsOnly) {
   const html = `<!DOCTYPE HTML>
     <html>
     <head>
+      <meta name="viewport" content="initial-scale=1.0, user-scalable=yes, width=device-width"/>
       <link href="styles.css" rel="stylesheet">
       <title>${trees.length === 1 ? trees[0].root.id + '\'s family tree' : 'Family tree' }</title>
     </head>

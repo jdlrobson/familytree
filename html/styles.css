@@ -3,6 +3,10 @@ body {
   white-space: nowrap;
 }
 
+ul {
+  white-space: pre-wrap;
+}
+
 .person {
   margin-left: 20px;
   border-left: solid 5px black;
@@ -12,7 +16,8 @@ body {
 .person__heading,
 .person__data,
 .person__text {
-  width: 500px;
+  width: 100vw;
+  white-space: normal;
   white-space: normal;
 }
 
