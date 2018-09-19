@@ -73,7 +73,7 @@ function requestTreeHTML(roots) {
 }
 
 function updateFields(node) {
-  return getUserInput( 'Field to update? (Press enter to update none)' ).then((field) => {
+  return getUserInput( node.data.title + ': Field to update? (Press enter to update none)' ).then((field) => {
     let msg;
     // @todo: spouse support
     if ( field === 'father' || field === 'mother' ) {
@@ -242,8 +242,14 @@ function findAndAddChild() {
           })
         }
       });
+    } else {
+      console.log( 'Parent not known. Adding to tree' );
+      const node = trees.addToTree( { text: '', title: parentName } );
+      displayPerson(node);
+      return updateFields(node).then(() => {
+        return saveTreeToJSON();
+      } );
     }
-    return saveTreeToJSON();
   } );
 }
 
